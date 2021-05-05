@@ -21,11 +21,15 @@ table1(~ factor(Sex_0.0) + Age.when.attended.assessment.centre_2.0+
        data=bd_no_missing)
 
 
+# Get IQR for Depression score
+summary(bd$Depression_score_2)
+
 
 model_1 <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
                  Depression_score_2,
                data = bd_no_missing)
 summary(model_1)
+summ(model_1, digits = getOption("jtools-digits", 4))
 
 
 
@@ -50,6 +54,41 @@ model_2 <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..fo
 summary(model_2)
 summ(model_2, digits = getOption("jtools-digits", 4))
 
+
+# Univariable tests for covariates
+
+model_age <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+              Age.when.attended.assessment.centre_2.0,
+              data = bd_no_missing)
+summary(model_age)
+summ(model_age, digits = getOption("jtools-digits", 4))
+
+
+model_sex <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                   Sex_0.0,
+                 data = bd_no_missing)
+summary(model_sex)
+summ(model_sex, digits = getOption("jtools-digits", 4))
+
+
+model_TDI <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                   Townsend.deprivation.index.at.recruitment_0.0,
+                 data = bd_no_missing)
+summary(model_TDI)
+summ(model_TDI, digits = getOption("jtools-digits", 4))
+
+
+model_college <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                       College,
+                 data = bd_no_missing)
+summary(model_college)
+summ(model_college, digits = getOption("jtools-digits", 4))
+
+model_BMI <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                   Body.mass.index..BMI._2.0,
+                     data = bd_no_missing)
+summary(model_BMI)
+summ(model_BMI, digits = getOption("jtools-digits", 4))
 
 Plot_2 <- ggplot(bd_no_missing, aes(Age.when.attended.assessment.centre_2.0, Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0)) + 
   geom_point(alpha = I(2/4), aes(color = factor(Age.when.attended.assessment.centre_2.0))) + 
@@ -121,10 +160,69 @@ summary(model_sensitivity_1)
 summ(model_sensitivity_1, digits = getOption("jtools-digits", 4))
 
 
+model_sensitivity_1_adj <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                             Depression_score_2+
+                               Age.when.attended.assessment.centre_2.0+
+                               Sex_0.0+
+                               Townsend.deprivation.index.at.recruitment_0.0+
+                               College +
+                               Body.mass.index..BMI._2.0,
+                           data = sensitivity_no_zeros)
+summary(model_sensitivity_1_adj)
+summ(model_sensitivity_1_adj, digits = getOption("jtools-digits", 4))
+
+
+
+# Univariable tests for covariates (sample without 0 values for depression)
+
+model_age <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                   Age.when.attended.assessment.centre_2.0,
+                 data = sensitivity_no_zeros)
+summary(model_age)
+summ(model_age, digits = getOption("jtools-digits", 4))
+
+
+model_sex <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                   Sex_0.0,
+                 data = sensitivity_no_zeros)
+summary(model_sex)
+summ(model_sex, digits = getOption("jtools-digits", 4))
+
+
+model_TDI <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                   Townsend.deprivation.index.at.recruitment_0.0,
+                 data = sensitivity_no_zeros)
+summary(model_TDI)
+summ(model_TDI, digits = getOption("jtools-digits", 4))
+
+
+model_college <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                       College,
+                     data = sensitivity_no_zeros)
+summary(model_college)
+summ(model_college, digits = getOption("jtools-digits", 4))
+
+model_BMI <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                   Body.mass.index..BMI._2.0,
+                 data = sensitivity_no_zeros)
+summary(model_BMI)
+summ(model_BMI, digits = getOption("jtools-digits", 4))
+
+
 # Compare 12 to 0
 
 t.test(subset(bd_no_missing, Depression_score_2 == 0)$Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0,
        subset(bd_no_missing, Depression_score_2 == 12)$Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0)
+
+
+# Compare 7-12 to 0
+
+t.test(subset(bd_no_missing, Depression_score_2 == 0)$Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0,
+       subset(bd_no_missing, Depression_score_2 > 6)$Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0)
+
+#Count observations
+length(subset(bd_no_missing, Depression_score_2 > 6)$Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0)
+
 
 
 # Test PHQ-2
@@ -137,6 +235,7 @@ model_1_PHQ2 <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mas
                       PHQ_2_2.0,
                data = bd_no_missing)
 summary(model_1_PHQ2)
+summ(model_1_PHQ2, digits = getOption("jtools-digits", 4))
 
 model_2_PHQ2 <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
                       PHQ_2_2.0+
@@ -147,7 +246,7 @@ model_2_PHQ2 <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mas
                  Body.mass.index..BMI._2.0,
                data = bd_no_missing)
 summary(model_2_PHQ2)
-summ(model_2_PHQ2)
+summ(model_2_PHQ2, digits = getOption("jtools-digits", 4))
 
 my.formula <- y ~ x
 Plot_PHQ2 <- ggplot(bd_no_missing, aes(PHQ_2_2.0, Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0)) + 
@@ -160,6 +259,9 @@ Plot_PHQ2 <- ggplot(bd_no_missing, aes(PHQ_2_2.0, Median.BOLD.effect..in.group.d
   labs(x = "Depression Score (PHQ-2)", y = "Median BOLD effect for faces > shapes")
 
 
+
+
+# Investigate depression diagnosis as predictor
 
 Plot_Depression_diagnosis <- ggplot(bd_no_missing, aes(Depression, Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0)) + 
   geom_jitter(alpha = I(2/4), aes(color = factor(Depression))) + 
@@ -176,7 +278,7 @@ model_1_diagnosis <- glm(Median.BOLD.effect..in.group.defined.amygdala.activatio
                       Depression,
                     data = bd_no_missing)
 summary(model_1_diagnosis)
-
+summ(model_1_diagnosis, digits = getOption("jtools-digits", 4))
 
 model_2_diagnosis <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
                       Depression+
@@ -186,11 +288,40 @@ model_2_diagnosis <- glm(Median.BOLD.effect..in.group.defined.amygdala.activatio
                       College +
                       Body.mass.index..BMI._2.0,
                     data = bd_no_missing)
-summary(model_2_diagnosis)
+summ(model_2_diagnosis, digits = getOption("jtools-digits", 4))
 
-model_1_antidepressants <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
-                          Depression + Antidepressants_2,
+
+
+
+model_2_antidepressants <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                            Depression_score_2 + 
+                            Antidepressants_2+
+                            Age.when.attended.assessment.centre_2.0+
+                            Sex_0.0+
+                            Townsend.deprivation.index.at.recruitment_0.0+
+                            College +
+                            Body.mass.index..BMI._2.0,
                          data = bd_no_missing)
-summary(model_1_antidepressants)
+summary(model_2_antidepressants)
+summ(model_2_antidepressants, digits = getOption("jtools-digits", 4))
+
+
+model_AD <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                  Antidepressants_2,
+                 data = bd_no_missing)
+summary(model_AD)
+summ(model_AD, digits = getOption("jtools-digits", 4))
+
+
+model_3_antidepressants <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                                 Antidepressants_2+
+                                 Age.when.attended.assessment.centre_2.0+
+                                 Sex_0.0+
+                                 Townsend.deprivation.index.at.recruitment_0.0+
+                                 College +
+                                 Body.mass.index..BMI._2.0,
+                               data = bd_no_missing)
+summary(model_3_antidepressants)
+summ(model_3_antidepressants, digits = getOption("jtools-digits", 4))
 
 
