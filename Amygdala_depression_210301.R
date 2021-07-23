@@ -3,6 +3,7 @@ require(lme4)
 library(ggpubr)
 require(jtools)
 require(table1)
+require(sensemakr)
 
 setwd("~/Desktop/UKB_amygdala_depression_data/")
 load("UKB_file_for_analyses.RData")
@@ -53,6 +54,9 @@ model_2 <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..fo
                data = bd_no_missing)
 summary(model_2)
 summ(model_2, digits = getOption("jtools-digits", 4))
+
+partial_f2(model_2)
+
 
 
 # Univariable tests for covariates
@@ -323,5 +327,82 @@ model_3_antidepressants <- glm(Median.BOLD.effect..in.group.defined.amygdala.act
                                data = bd_no_missing)
 summary(model_3_antidepressants)
 summ(model_3_antidepressants, digits = getOption("jtools-digits", 4))
+
+# Look at CIDI defined depression
+
+load("MH_follow_up.RData")
+
+MHData <- merge(data, bd_no_missing)
+
+Plot_CIDI_Depression <- ggplot(MHData, aes(CIDI_depression, Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0)) + 
+  geom_jitter(alpha = I(2/4), aes(color = factor(CIDI_depression))) + 
+  stat_summary(fun.data = mean_cl_normal, geom = "crossbar",
+               width = .5, color = "black")+  
+  theme_bw() +
+  theme(axis.title.x = element_text(face = "bold", color = "black", size = 10),
+        axis.title.y = element_text(face = "bold", color = "black", size = 10), 
+        legend.position = "none") + 
+  labs(x = "CIDI Depression", y = "Median BOLD effect for faces > shapes")
+
+
+model_1_CIDI <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                           CIDI_depression,
+                         data = MHData)
+summary(model_1_CIDI)
+summ(model_1_CIDI, digits = getOption("jtools-digits", 4))
+
+model_2_CIDI <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                          CIDI_depression+
+                           Age.when.attended.assessment.centre_2.0+
+                           Sex_0.0+
+                           Townsend.deprivation.index.at.recruitment_0.0+
+                           College +
+                           Body.mass.index..BMI._2.0,
+                         data = MHData)
+summ(model_2_CIDI, digits = getOption("jtools-digits", 4))
+
+
+sink(file = "CIDI_model.txt")
+summ(model_2_CIDI, digits = getOption("jtools-digits", 4))
+sink(file = NULL)
+
+
+# Univariable tests for covariates
+
+model_age <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                   Age.when.attended.assessment.centre_2.0,
+                 data = MHData)
+summary(model_age)
+summ(model_age, digits = getOption("jtools-digits", 4))
+
+
+model_sex <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                   Sex_0.0,
+                 data = MHData)
+summary(model_sex)
+summ(model_sex, digits = getOption("jtools-digits", 4))
+
+
+model_TDI <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                   Townsend.deprivation.index.at.recruitment_0.0,
+                 data = MHData)
+summary(model_TDI)
+summ(model_TDI, digits = getOption("jtools-digits", 4))
+
+
+model_college <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                       College,
+                     data = MHData)
+summary(model_college)
+summ(model_college, digits = getOption("jtools-digits", 4))
+
+model_BMI <- glm(Median.BOLD.effect..in.group.defined.amygdala.activation.mask..for.faces.shapes.contrast_2.0 ~
+                   Body.mass.index..BMI._2.0,
+                 data = MHData)
+summary(model_BMI)
+summ(model_BMI, digits = getOption("jtools-digits", 4))
+
+
+
 
 
