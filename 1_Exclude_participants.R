@@ -65,7 +65,9 @@ bd <- subset(bd, select = c("eid",
 "f_Ever.depressed.for.a.whole.week_2.0",                                                       
 "Smoking.status_2.0",
 "Antidepressants_2",
-"Depression")
+"Depression",
+"Median.BOLD.effect..in.group.defined.mask..for.shapes.activation_2.0",
+"Median.BOLD.effect..in.group.defined.mask..for.faces.activation_2.0")
 )
 
 # save file for later
